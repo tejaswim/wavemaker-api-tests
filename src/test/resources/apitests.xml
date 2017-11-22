@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Database API Tests" verbose="0" parallel="tests" thread-count="5" junit="false">
+    <test name="Oracle DB Tests">
+        <classes>
+            <class name="com.wavemaker.api.tests.runtime.OracleWithBlobTests"/>
+        </classes>
+    </test>
+    <test name="HRDB Tests">
+        <classes>
+            <class name="com.wavemaker.api.tests.runtime.HRDBTests"/>
+        </classes>
+    </test>
+</suite>

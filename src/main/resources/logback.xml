@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- For assistance related to logback-translator or configuration  -->
+<!-- files in general, please contact the logback user mailing list -->
+<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
+<!--                                                                -->
+<!-- For professional support please see                            -->
+<!--    http://www.qos.ch/shop/products/professionalSupport         -->
+<!--                                                                -->
+<configuration>
+
+    <appender name="testLogs" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <key>variable</key>
+            <defaultValue>All</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="testLogsAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
+                <append>false</append>
+                <file>./logs/${variable}.log</file>
+                <encoder>
+                    <pattern>%d{dd/MM/yyyy HH:mm:ss} %t %p %class{0} [%m] %ex %n</pattern>
+                </encoder>
+                <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+                    <maxIndex>6</maxIndex>
+                    <FileNamePattern>./logs/${variable}.log.%i</FileNamePattern>
+                </rollingPolicy>
+                <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+                    <maxFileSize>15MB</maxFileSize>
+                </triggeringPolicy>
+            </appender>
+        </sift>
+    </appender>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%d{dd/MM/yyyy HH:mm:ss} %t %p %class{0} [%m] %ex %n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="testLogs"/>
+    </root>
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
