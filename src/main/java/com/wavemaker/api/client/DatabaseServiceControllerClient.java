@@ -28,6 +28,7 @@ public class DatabaseServiceControllerClient extends BaseClient {
     private final String importDbUrl = STUDIO_SERVICES_URL + "/database/services/import";
     private final String sampleDbConnectionPropsUrl = STUDIO_SERVICES_URL + "/database/sample/connectionProps";
     private final String uploadLibUrl = STUDIO_SERVICES_URL + "/resources/content/lib";
+    private final String importSqlFileUrl = "/services/rest/shell/db/import?db=:dbName";
 
     public String verifyJar(String studioProjectId, String dbType) {
         String url = constructUrl(verifyJarUrl,
@@ -61,5 +62,15 @@ public class DatabaseServiceControllerClient extends BaseClient {
         String url = constructUrl(sampleDbConnectionPropsUrl, new String[][]{{STUDIO_PROJECT_ID, studioProjectId}});
         DBConnectionProps dbConnectionProps = get(url, DBConnectionProps.class);
         return dbConnectionProps;
+    }
+
+    public Object importSqlFile(String studioProjectId, String dbName, final File file) {
+        String url = constructUrl(importSqlFileUrl, new String[][]{{STUDIO_PROJECT_ID, studioProjectId}, {"dbName",
+                dbName}});
+        MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
+        multiValueMap.add("file", new FileSystemResource(file));
+        multiValueMap.add("properties", new FileSystemResource(file));
+        Object result = post(url, new MultipartInput(multiValueMap), Object.class);
+        return result;
     }
 }

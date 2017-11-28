@@ -19,5 +19,4 @@ public class SecurityManager {
         SECURITY_CONTEXT.remove();
     }
 
-
 }

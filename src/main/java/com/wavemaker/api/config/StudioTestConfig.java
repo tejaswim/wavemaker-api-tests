@@ -78,8 +78,13 @@ public class StudioTestConfig {
         return getProperty("baseurl");
     }
 
-    public String getInvocationCount() {
-        return getProperty("invocationcount");
+    public Integer getInvocationCount() {
+        String invocationcount = getProperty("invocationcount");
+        try {
+            return Integer.parseInt(invocationcount);
+        } catch (NumberFormatException e) {
+            return Integer.MAX_VALUE;
+        }
     }
 
     private List<CSVRecord> getUserRecords() {

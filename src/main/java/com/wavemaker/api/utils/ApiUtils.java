@@ -128,7 +128,7 @@ public class ApiUtils {
 
     public static String getSqlFilePath(String sqlFileName) {
         try {
-            ClassPathResource file = new ClassPathResource("sqlfiles/" + sqlFileName);
+            ClassPathResource file = new ClassPathResource("testdata/sqlfiles/" + sqlFileName);
             File tempDirectory = FileUtils.getTempDirectory();
             File tempJarDirectory = new File(tempDirectory, UUID.randomUUID().toString());
             tempJarDirectory.mkdirs();

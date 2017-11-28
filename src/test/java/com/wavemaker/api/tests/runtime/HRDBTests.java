@@ -16,7 +16,7 @@ import com.wavemaker.api.tests.designtime.database.SampleDBCreator;
 /**
  * Created by Tejaswi Maryala on 11/17/2017.
  */
-public class HRDBTests extends BaseTest{
+public class HRDBTests extends BaseTest {
 
     private static final Logger logger = LoggerFactory.getLogger(HRDBTests.class);
     private DatabaseRunTimeControllerClient dbRunTimeClient = new DatabaseRunTimeControllerClient();
@@ -24,12 +24,12 @@ public class HRDBTests extends BaseTest{
     private String runtimeId;
 
     @BeforeClass
-    public void importDB(){
+    public void importDB() {
         runtimeId = sampleDBCreator.createDBService(getProjectDetails());
     }
 
-    @Test
-    public void getAllRecords(){
+    @Test(groups = {"Runtime", "Database", "sampledb"}, description = "Verifies if we are able to get all records with blob table")
+    public void getAllRecords() {
         //Step 1
         List<HrdbUser> response = dbRunTimeClient.getAllUsers(runtimeId, getProjectDetails().getName(), "hrdb", "User");
         Assert.assertNotNull(response, "no of records in the table should not be 0");

@@ -32,6 +32,14 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>${project.basedir}/src/test/resources/${suiteName}.xml</suiteXmlFile>
                     </suiteXmlFiles>
+                    <properties>
+                        <property>
+                            <name>listener</name>
+                            <value>
+                                com.wavemaker.api.listeners.WMInvokedListener
+                            </value>
+                        </property>
+                    </properties>
                 </configuration>
             </plugin>
             <plugin>
@@ -62,7 +70,17 @@
         <resources>
             <resource>
                 <directory>${project.basedir}/src/main/resources</directory>
+                <includes>
+                    <include>testdata/**</include>
+                </includes>
                 <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+                <excludes>
+                    <exclude>testdata/**</exclude>
+                </excludes>
+                <filtering>true</filtering>
             </resource>
         </resources>
     </build>
@@ -72,13 +90,41 @@
             <id>Studio_API_Test</id>
             <properties>
                 <suiteName>apitests</suiteName>
+                <groupName>oracle</groupName>
+            </properties>
+        </profile>
+        <profile>
+            <id>WaveMaker-staging</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <baseurl>https://stage-studio.wavemakeronline.com</baseurl>
+            </properties>
+        </profile>
+        <profile>
+            <id>WaveMaker-dev</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <baseurl>https://dev-studio.wavemakeronline.com</baseurl>
+            </properties>
+        </profile>
+        <profile>
+            <id>WaveMaker-prod</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <baseurl>https://www.wavemakeronline.com</baseurl>
             </properties>
         </profile>
     </profiles>
 
     <properties>
         <maven.compiler.plugin.version>2.4</maven.compiler.plugin.version>
-        <maven.surefire.plugin.version>2.19.1</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>2.20.1</maven.surefire.plugin.version>
         <testng.version>6.9.13.5</testng.version>
         <spring.version>5.0.0.RELEASE</spring.version>
         <slf4j.version>1.7.12</slf4j.version>

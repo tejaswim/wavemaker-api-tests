@@ -33,7 +33,7 @@ public abstract class BaseTest implements ApiTest {
         this.projectDetails = projectDetails;
     }
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void loginAndCreateProject(){
         authenticationManager.login();
         projectDetails = projectHandler.createProject(getProjectModel());
