@@ -36,7 +36,7 @@
                         <property>
                             <name>listener</name>
                             <value>
-                                com.wavemaker.api.listeners.WMInvokedListener
+                                com.wavemaker.api.listeners.WMIAnnotationTransformer
                             </value>
                         </property>
                     </properties>

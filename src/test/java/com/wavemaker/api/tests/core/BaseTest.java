@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
+import com.wavemaker.api.client.ProjectControllerClient;
 import com.wavemaker.api.config.StudioTestConfig;
 import com.wavemaker.api.rest.models.project.PlatformType;
 import com.wavemaker.api.rest.models.project.ProjectDetails;
@@ -24,6 +25,7 @@ public abstract class BaseTest implements ApiTest {
             StudioTestConfig.getInstance().getUsersCSV(),StudioTestConfig.getInstance().getNoOfUsers());
     private ProjectHandler projectHandler = new ProjectHandler();
     private ProjectDetails projectDetails;
+    private ProjectControllerClient projectControllerClient = new ProjectControllerClient();
 
     public ProjectDetails getProjectDetails() {
         return projectDetails;
@@ -36,6 +38,7 @@ public abstract class BaseTest implements ApiTest {
     @BeforeClass(alwaysRun = true)
     public void loginAndCreateProject(){
         authenticationManager.login();
+//        projectControllerClient.deleteAllProjects();
         projectDetails = projectHandler.createProject(getProjectModel());
     }
 

@@ -11,14 +11,15 @@ import org.testng.annotations.Test;
 
 import com.wavemaker.api.client.DatabaseRunTimeControllerClient;
 import com.wavemaker.api.rest.models.RestResponse;
-import com.wavemaker.api.rest.models.database.HrdbUser;
 import com.wavemaker.api.rest.models.database.wmstudio.AllTypes;
-import com.wavemaker.api.tests.builder.DBObjectsBuilder;
+import com.wavemaker.api.tests.builder.OracleDBObjectsBuilder;
 import com.wavemaker.api.tests.core.BaseTest;
 import com.wavemaker.api.tests.designtime.database.MySqlDBCreator;
 import com.wavemaker.studio.core.data.constants.DBType;
 import com.wavemaker.studio.core.props.DBConnectionProps;
 import com.wavemaker.studio.core.props.TableSelector;
+
+import static com.wavemaker.api.constants.GroupNameConstants.*;
 
 /**
  * Created by Tejaswi Maryala on 11/27/2017.
@@ -30,7 +31,6 @@ public class MysqlExternalDBTests extends BaseTest {
     private final String dbName = "AllTypesDBAutomation";
     private DatabaseRunTimeControllerClient dbRunTimeClient = new DatabaseRunTimeControllerClient();
     private String runtimeId;
-    private AllTypes buildAllTypes = DBObjectsBuilder.buildAllTypes();
 
     @BeforeClass
     public void importDB() {
@@ -38,28 +38,30 @@ public class MysqlExternalDBTests extends BaseTest {
         runtimeId = mySqlDBCreator.createDBService(getProjectDetails());
     }
 
-    @Test(groups = {"Runtime", "Database", "mysqlexternal"}, description = "Verifies if we are able to get all records with blob table")
+    @Test(groups = {RUNTIME, DATABASE, MYSQL_EXTERNAL, GET}, description = "Verifies if we are able to get all records with blob table")
     public void getAllRecords() {
         //Step 1
-        List<HrdbUser> response = dbRunTimeClient.getAllUsers(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME);
+        List<AllTypes> response = dbRunTimeClient
+                .getAllRecords(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME, AllTypes.class).getContent();
         Assert.assertNotNull(response, "no of records in the table should not be 0");
         logger.info("Get all users is successful");
     }
 
-    @Test(groups = {"Runtime", "Database", "mysqlexternal"}, description = "Verifies if insertion is successful with blob table")
+    @Test(groups = {RUNTIME, DATABASE, MYSQL_EXTERNAL, INSERT}, description = "Verifies if insertion is successful with blob table")
     public void insertBlobData() {
+        AllTypes buildAllTypes = OracleDBObjectsBuilder.buildAllTypes();
         AllTypes response = dbRunTimeClient.insertRecordWithMultipartData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
                 buildAllTypes);
         Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Successful {}", response.toString());
+        logger.info("Data insertion with blob column is Successful with response {}", response.toString());
     }
 
-    @Test(groups = {"Runtime", "Database", "mysqlexternal"}, description = "Verifies if export data is successful with blob table")
+    @Test(groups = {RUNTIME, DATABASE, MYSQL_EXTERNAL, EXPORT}, description = "Verifies if export data is successful with blob table")
     public void exportBlobData() {
         RestResponse response = dbRunTimeClient.exportBlobData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
                 "CSV");
         Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Successful {}", response.toString());
+        logger.info("Export to CSV is successful with response {}", response.toString());
     }
 
 

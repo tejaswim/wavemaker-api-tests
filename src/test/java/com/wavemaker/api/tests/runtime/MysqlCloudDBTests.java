@@ -15,13 +15,15 @@ import com.wavemaker.api.client.DatabaseServiceControllerClient;
 import com.wavemaker.api.rest.models.RestResponse;
 import com.wavemaker.api.rest.models.database.HrdbUser;
 import com.wavemaker.api.rest.models.database.wmstudio.AllTypes;
-import com.wavemaker.api.tests.builder.DBObjectsBuilder;
+import com.wavemaker.api.tests.builder.OracleDBObjectsBuilder;
 import com.wavemaker.api.tests.core.BaseTest;
 import com.wavemaker.api.tests.designtime.database.MySqlDBCreator;
 import com.wavemaker.api.utils.ApiUtils;
 import com.wavemaker.studio.core.data.constants.DBType;
 import com.wavemaker.studio.core.props.DBConnectionProps;
 import com.wavemaker.studio.core.props.TableSelector;
+
+import static com.wavemaker.api.constants.GroupNameConstants.*;
 
 /**
  * Created by Tejaswi Maryala on 11/27/2017.
@@ -34,7 +36,6 @@ public class MysqlCloudDBTests extends BaseTest {
     private String runtimeId;
     private String dbName;
     private final String TABLE_NAME = "AllTypes";
-    private AllTypes buildAllTypes = DBObjectsBuilder.buildAllTypes();
 
     @BeforeClass
     public void importDB() {
@@ -45,7 +46,7 @@ public class MysqlCloudDBTests extends BaseTest {
         runtimeId = mySqlDBCreator.createDBService(getProjectDetails());
     }
 
-    @Test(groups = {"Runtime", "Database", "mysqlcloud"}, description = "Verifies if we are able to get all records with blob table")
+    @Test(groups = {RUNTIME, DATABASE, MYSQL_CLOUD, GET}, description = "Verifies if we are able to get all records with blob table")
     public void getAllRecords() {
         //Step 1
         List<HrdbUser> response = dbRunTimeClient.getAllUsers(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME);
@@ -53,23 +54,24 @@ public class MysqlCloudDBTests extends BaseTest {
         logger.info("Get all users is successful");
     }
 
-    @Test(groups = {"Runtime", "Database", "mysqlcloud"}, description = "Verifies if insertion is successful with blob table")
+    @Test(groups = {RUNTIME, DATABASE, MYSQL_CLOUD, INSERT}, description = "Verifies if insertion is successful with blob table")
     public void insertBlobData() {
+        AllTypes buildAllTypes = OracleDBObjectsBuilder.buildAllTypes();
         AllTypes response = dbRunTimeClient.insertRecordWithMultipartData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
                 buildAllTypes);
         Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Successful {}", response.toString());
+        logger.info("Data insertion with blob column is Successful with response {}", response.toString());
     }
 
-    @Test(groups = {"Runtime", "Database", "mysqlcloud"}, description = "Verifies if export data is successful with blob table")
+    @Test(groups = {RUNTIME, DATABASE, MYSQL_CLOUD, EXPORT}, description = "Verifies if export data is successful with blob table")
     public void exportBlobData() {
         RestResponse response = dbRunTimeClient.exportBlobData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
                 "CSV");
         Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Successful {}", response.toString());
+        logger.info("Export to CSV is successful with response {}", response.toString());
     }
 
-    public static DBConnectionProps getMysqlCloudProps(String projectName, String dataModelName) {
+    private static DBConnectionProps getMysqlCloudProps(String projectName, String dataModelName) {
         DBConnectionProps props = new DBConnectionProps();
         String id = dataModelName;
         props.setSchemaName(id);

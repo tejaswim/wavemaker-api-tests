@@ -26,7 +26,7 @@ public class MySqlDBCreator implements DatabaseServiceCreator {
         String studioProjectId = projectDetails.getStudioProjectId();
 
         //Step 1
-        dbServiceClient.verifyJar(studioProjectId, DBType.MYSQL.getUiTypeString());
+        String verifyJar = dbServiceClient.verifyJar(studioProjectId, dbConnectionProps.getDbType().getUiTypeString());
 
         //Step 2
         DataModel result = dbServiceClient.importDatabase(studioProjectId, dbConnectionProps);
