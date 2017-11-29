@@ -26,7 +26,7 @@ public class WMIAnnotationTransformer implements IAnnotationTransformer {
             if (annotation1 instanceof Test) {
                 int count = StudioTestConfig.getInstance().getInvocationCount();
                 annotation.setInvocationCount(count);
-                logger.info("Successfully set invocation count as {} for test {}", count, annotation.getTestName());
+                logger.info("Successfully set invocation count as {} for test {}", count, testMethod.getName());
             }
         }
     }

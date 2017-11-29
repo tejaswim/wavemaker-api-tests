@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="Database API Tests" verbose="0" parallel="tests" thread-count="2" junit="false">
-<!--    <listeners>
-        <listener class-name="com.wavemaker.api.listeners.WMIAnnotationTransformer"/>
-    </listeners>
     <test name="Oracle DB Tests">
         <classes>
             <class name="com.wavemaker.api.tests.runtime.OracleWithBlobTests"/>
@@ -23,19 +20,15 @@
         <classes>
             <class name="com.wavemaker.api.tests.runtime.MysqlExternalDBTests"/>
         </classes>
-    </test>-->
+    </test>
     <test name="Postgres SQL Tests">
         <classes>
-            <class name="com.wavemaker.api.tests.runtime.PostgressqlWithBlobTests">
-                <methods>
-                    <include name="getAllBlobData"/>
-                </methods>
-            </class>
+            <class name="com.wavemaker.api.tests.runtime.PostgressqlWithBlobTests"/>
         </classes>
     </test>
-   <!-- <test name="Sql Server Tests">
+    <test name="Sql Server Tests">
         <classes>
             <class name="com.wavemaker.api.tests.runtime.SQLServerWithBlobTests"/>
         </classes>
-    </test>-->
+    </test>
 </suite>

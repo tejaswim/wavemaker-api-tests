@@ -1,6 +1,5 @@
-package com.wavemaker.api.tests.designtime.login;
+package com.wavemaker.api.login;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -48,4 +47,6 @@ public abstract class AuthenticationManager {
         LOGGER.info("User index is {} and user name is {}", j, user.getUserName());
         return user;
     }
+
+    public abstract User login(User user);
 }

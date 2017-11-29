@@ -12,7 +12,7 @@ import com.wavemaker.api.rest.models.project.PlatformType;
 import com.wavemaker.api.rest.models.project.ProjectDetails;
 import com.wavemaker.api.rest.models.project.ProjectModel;
 import com.wavemaker.api.rest.models.project.ProjectType;
-import com.wavemaker.api.tests.designtime.login.ApiAuthenticationManager;
+import com.wavemaker.api.login.ApiAuthenticationManager;
 import com.wavemaker.api.tests.designtime.project.ProjectHandler;
 
 /**
@@ -38,7 +38,6 @@ public abstract class BaseTest implements ApiTest {
     @BeforeClass(alwaysRun = true)
     public void loginAndCreateProject(){
         authenticationManager.login();
-//        projectControllerClient.deleteAllProjects();
         projectDetails = projectHandler.createProject(getProjectModel());
     }
 
@@ -47,10 +46,11 @@ public abstract class BaseTest implements ApiTest {
         projectHandler.deleteProject(projectDetails);
     }
 
-    protected ProjectModel getProjectModel() {
+    private ProjectModel getProjectModel() {
         ProjectModel projectModel = new ProjectModel();
-        projectModel.setName("dbproj" + RandomStringUtils.randomNumeric(6));
-        projectModel.setDescription("");
+        String appName = "dbproj" + RandomStringUtils.randomNumeric(6);
+        projectModel.setName(appName);
+        projectModel.setDescription(appName);
         projectModel.setProjectType(ProjectType.APPLICATION);
         projectModel.setPlatformType(PlatformType.WEB);
         projectModel.setProjectShellId("");

@@ -83,11 +83,19 @@ public class StudioTestConfig {
         try {
             return Integer.parseInt(invocationcount);
         } catch (NumberFormatException e) {
-            return Integer.MAX_VALUE;
+            return 1;
         }
     }
 
-    private List<CSVRecord> getUserRecords() {
+    public Boolean getCleanUpStatus() {
+        return new Boolean(getProperty("cleanup"));
+    }
+
+    public String getBrowser() {
+        return getProperty("browser");
+    }
+
+    public List<CSVRecord> getUserRecords() {
         final File runtimeResource = RuntimeUtil.getRuntimeResource(getUsersCSV());
         return getUserRecords(runtimeResource);
     }

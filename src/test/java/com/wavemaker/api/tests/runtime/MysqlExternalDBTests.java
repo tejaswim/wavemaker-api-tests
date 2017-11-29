@@ -32,7 +32,7 @@ public class MysqlExternalDBTests extends BaseTest {
     private DatabaseRunTimeControllerClient dbRunTimeClient = new DatabaseRunTimeControllerClient();
     private String runtimeId;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void importDB() {
         MySqlDBCreator mySqlDBCreator = new MySqlDBCreator(getMysqlExternalProps(getProjectDetails().getName(), dbName));
         runtimeId = mySqlDBCreator.createDBService(getProjectDetails());

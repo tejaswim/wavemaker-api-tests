@@ -31,7 +31,7 @@ public class PostgressqlWithBlobTests extends BaseTest {
     private DatabaseRunTimeControllerClient dbRunTimeClient = new DatabaseRunTimeControllerClient();
     private String runtimeId;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void importPostgresSQLDB() {
         MySqlDBCreator mySqlDBCreator = new MySqlDBCreator(getPostgressqlDBConnectionProps(getProjectDetails().getName()));
         runtimeId = mySqlDBCreator.createDBService(getProjectDetails());
@@ -110,7 +110,7 @@ public class PostgressqlWithBlobTests extends BaseTest {
         dbConnectionProps.setSchemaFilter(schemaFilter);
         dbConnectionProps.setImpersonateUser(false);
         dbConnectionProps.setMaxPageSize(100);
-        dbConnectionProps.setUsername("AllTypes");
+        dbConnectionProps.setUsername("postgres");
         dbConnectionProps.setPassword("wavemaker");
         dbConnectionProps.setUrl("jdbc:postgresql://ec2-54-87-2-36.compute-1.amazonaws.com:5432/" + dbName);
         dbConnectionProps.setDialect("com.wavemaker.runtime.data.dialect.WMPostgresSQLDialect");

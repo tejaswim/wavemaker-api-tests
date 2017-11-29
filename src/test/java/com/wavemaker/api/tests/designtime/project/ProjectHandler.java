@@ -31,13 +31,13 @@ public class ProjectHandler implements ProjectCreator {
 
     @Override
     public boolean deleteProject(ProjectDetails projectDetails) {
-        /*if (StringUtils.isNotBlank(projectDetails.getProjectId())) {
+        if (StringUtils.isNotBlank(projectDetails.getProjectId())) {
             boolean deleteProject = projectControllerClient.deleteProject(projectDetails.getProjectId());
             if (deleteProject) {
                 LOGGER.info("Project {} deletion is successful", projectDetails.getName());
                 return true;
             }
-        }*/
+        }
         return false;
     }
 }

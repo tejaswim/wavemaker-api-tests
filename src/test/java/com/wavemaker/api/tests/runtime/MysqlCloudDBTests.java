@@ -37,7 +37,7 @@ public class MysqlCloudDBTests extends BaseTest {
     private String dbName;
     private final String TABLE_NAME = "AllTypes";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void importDB() {
         dbName = "alltypes";
         MySqlDBCreator mySqlDBCreator = new MySqlDBCreator(getMysqlCloudProps(getProjectDetails().getName(), dbName));

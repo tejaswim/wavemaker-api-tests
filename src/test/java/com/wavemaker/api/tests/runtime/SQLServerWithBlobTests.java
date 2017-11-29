@@ -31,7 +31,7 @@ public class SQLServerWithBlobTests extends BaseTest {
     private DatabaseRunTimeControllerClient dbRunTimeClient = new DatabaseRunTimeControllerClient();
     private String runtimeId;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void importSqlServerDB() {
         OtherDBService otherDBService = new OtherDBService(getSQLServerDBConnectionProps(getProjectDetails().getName()),
                 "testdata/dbjars/sqljdbc4-4.0.jar");

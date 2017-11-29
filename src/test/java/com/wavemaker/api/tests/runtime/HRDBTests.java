@@ -32,7 +32,7 @@ public class HRDBTests extends BaseTest {
     private String dbName = "hrdb";
     private String tableName = "User";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void importDB() {
         runtimeId = sampleDBCreator.createDBService(getProjectDetails());
     }

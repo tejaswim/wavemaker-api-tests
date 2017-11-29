@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">
+<html xmlns=\"http://www.w3.org/1999/xhtml\">
+<head>
+    <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js\"></script>
+    <script>
+	$(document).ready(function() {
+		${toggleServerLogs}
+		${toggleAppLogs}
+	});
+
+    </script>
+    <title>Wavemaker Studio ${suitename} Report</title>
+    <h2>
+        <center>Wavemaker Studio ${suitename} Report</center>
+    </h2>
+    <style type="text/css">
+		table {margin-bottom:10px;border-collapse:collapse;empty-cells:show}
+		td,th {border:1px solid #009;padding:.25em .5em}
+		.result th {vertical-align:bottom}
+		.param th {padding-left:1em;padding-right:1em}
+		.param td {padding-left:.5em;padding-right:2em}
+		.stripe td,.stripe th {background-color: #E6EBF9}
+		.numi,.numi_attn {text-align:right}
+		.total td {font-weight:bold}
+		.passedodd td, .passedodd th {background-color: #88ff4d}
+		.passedeven td, .passedeven th {background-color: #99ff66}
+		.skippedodd td, .skippedodd th {background-color: #CCC}
+		.skippedodd td, .skippedodd th {background-color: #DDD}
+		.failedodd td, .failedodd th, .numi_attn {background-color: #ff8566}
+		.failedeven td, .failedeven th, .stripe .numi_attn {background-color: #ff714d}
+		.stacktrace {white-space:pre;font-family:monospace}
+		.totop {font-size:85%;text-align:center;border-bottom:2px solid #000}
+        .tdHighlighter{background-color:#264b7f;COLOR:#E0E0E0;font-weight: bold;text-align:left}
+		.passed{background-color: #88ff4d;}
+		.skipped{background-color: #DDD;}
+		.textdecoration{text-decoration: underline;}
+    </style>
+</head>
+<body>
+
+
+<table cellspacing="0" cellpadding="0" class="testOverview" style="float: left;margin-right: 25%;">
+
+    <tr>
+        <td colspan='2' align='center'><FONT COLOR='#264b7f'
+                                             FACE='Arial' SIZE=2><b>Environment</b></FONT></td>
+    </tr>
+    <tr>
+        <td width=150 align='left' bgcolor='#264b7f'><FONT
+                COLOR='#E0E0E0'><b>HOST NAME</b></FONT></td>
+        <td width=300 align='left' color='#264b7f'><FONT><b>${hostname}</b></FONT></td>
+    </tr>
+    <tr>
+        <td width=150 align='left' bgcolor='#264b7f'><FONT
+                COLOR='#E0E0E0'><b>OS NAME</b></FONT></td>
+        <td width=300 align='left' color='#264b7f'><FONT><b>${osname}</b></FONT></td>
+    </tr>
+    <tr>
+        <td width=150 align='left' bgcolor='#264b7f'><FONT
+                COLOR='#E0E0E0'><b>OS VERSION</b></FONT></td>
+        <td width=300 align='left' color='#264b7f'><FONT><b>${osversion}</b></FONT></td>
+    </tr>
+    <tr>
+        <td width=150 align='left' bgcolor='#264b7f'><FONT
+                COLOR='#E0E0E0'><b>ENVIRONMENT</b></FONT></td>
+        <td width=300 align='left' color='#264b7f'><FONT><b>${url}</b></FONT></td>
+    </tr>
+    <tr>
+        <td width=150 align='left' bgcolor='#264b7f'><FONT
+                COLOR='#E0E0E0'><b>BROWSER</b></FONT></td>
+        <td width=300 align='left' color='#264b7f'><FONT><b>${browser}</b></FONT></td>
+    </tr>
+    <tr>
+        <td width=150 align='left' bgcolor='#264b7f'><FONT
+                COLOR='#E0E0E0'><b>TIME</b></FONT></td>
+        <td width=300 align='left' color='#264b7f'><FONT><b>${timestamp}</b></FONT></td>
+    </tr>
+</table>

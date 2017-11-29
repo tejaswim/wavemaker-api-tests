@@ -19,4 +19,11 @@ public class StringWrapper {
     public void setResult(final String result) {
         this.result = result;
     }
+
+    @Override
+    public String toString() {
+        return "StringWrapper{" +
+                "result='" + result + '\'' +
+                '}';
+    }
 }

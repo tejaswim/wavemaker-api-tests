@@ -30,13 +30,16 @@
                     <groups>${groupName}</groups>
                     <testFailureIgnore>true</testFailureIgnore>
                     <suiteXmlFiles>
-                        <suiteXmlFile>${project.basedir}/src/test/resources/${suiteName}.xml</suiteXmlFile>
+                        <suiteXmlFile>${project.basedir}/src/test/resources/apitests.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <properties>
                         <property>
                             <name>listener</name>
                             <value>
-                                com.wavemaker.api.listeners.WMIAnnotationTransformer
+                                com.wavemaker.api.listeners.WMIAnnotationTransformer,
+                                com.wavemaker.api.listeners.WMIAlterListener,
+                                com.wavemaker.api.listeners.WMTestListener,
+                                com.wavemaker.api.report.ReportGenerator2
                             </value>
                         </property>
                     </properties>
@@ -90,7 +93,6 @@
             <id>Studio_API_Test</id>
             <properties>
                 <suiteName>apitests</suiteName>
-                <groupName>oracle</groupName>
             </properties>
         </profile>
         <profile>
@@ -124,7 +126,7 @@
 
     <properties>
         <maven.compiler.plugin.version>2.4</maven.compiler.plugin.version>
-        <maven.surefire.plugin.version>2.20.1</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>2.20</maven.surefire.plugin.version>
         <testng.version>6.9.13.5</testng.version>
         <spring.version>5.0.0.RELEASE</spring.version>
         <slf4j.version>1.7.12</slf4j.version>
