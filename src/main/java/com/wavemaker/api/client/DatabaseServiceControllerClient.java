@@ -31,14 +31,14 @@ public class DatabaseServiceControllerClient extends BaseClient {
     private final String importSqlFileUrl = "/deployment-cloud/rest/shell/db/import?db=";
 
     public String verifyJar(String studioProjectId, String dbType) {
-        String url = constructUrl(verifyJarUrl,
+        String url = constructUrl(getBaseUrl() + verifyJarUrl,
                 new String[][]{{STUDIO_PROJECT_ID, studioProjectId}, {"dbType", dbType}});
         StringWrapper result = get(url, StringWrapper.class);
         return result.getResult();
     }
 
     public Object uploadJar(String studioProjectId, File file) {
-        String url = constructUrl(uploadLibUrl, new String[][]{{STUDIO_PROJECT_ID, studioProjectId}});
+        String url = constructUrl(getBaseUrl() + uploadLibUrl, new String[][]{{STUDIO_PROJECT_ID, studioProjectId}});
         MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("file", new FileSystemResource(file));
         Object result = post(url, new MultipartInput(multiValueMap), Object.class);
@@ -47,25 +47,24 @@ public class DatabaseServiceControllerClient extends BaseClient {
 
 
     public DataModel importDatabase(String studioProjectId, final DBConnectionProps connectionProps) {
-        String url = constructUrl(importDbUrl, new String[][]{{STUDIO_PROJECT_ID, studioProjectId}});
+        String url = constructUrl(getBaseUrl() + importDbUrl, new String[][]{{STUDIO_PROJECT_ID, studioProjectId}});
         IRestInput payload = new RestInputImpl() {
             @Override
             public DBConnectionProps getPayload() {
                 return connectionProps;
             }
         };
-        DataModel result = post(url, payload, DataModel.class);
-        return result;
+        return post(url, payload, DataModel.class);
     }
 
     public DBConnectionProps getSampleDbConnectionProps(String studioProjectId) {
-        String url = constructUrl(sampleDbConnectionPropsUrl, new String[][]{{STUDIO_PROJECT_ID, studioProjectId}});
+        String url = constructUrl(getBaseUrl() + sampleDbConnectionPropsUrl, new String[][]{{STUDIO_PROJECT_ID, studioProjectId}});
         DBConnectionProps dbConnectionProps = get(url, DBConnectionProps.class);
         return dbConnectionProps;
     }
 
     public Object importSqlFile(String studioProjectId, String dbName, final File file) {
-        String url = constructUrl(importSqlFileUrl, new String[][]{{STUDIO_PROJECT_ID, studioProjectId}, {"dbName",
+        String url = constructUrl(getBaseUrl() + importSqlFileUrl, new String[][]{{STUDIO_PROJECT_ID, studioProjectId}, {"dbName",
                 dbName}});
         MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("file", new FileSystemResource(file));

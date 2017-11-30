@@ -5,16 +5,14 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.wavemaker.api.client.DatabaseRunTimeControllerClient;
-import com.wavemaker.api.rest.models.RestResponse;
 import com.wavemaker.api.rest.models.database.sqlserver.AllTypes;
 import com.wavemaker.api.tests.builder.SqlServerDBObjectsBuilder;
 import com.wavemaker.api.tests.core.BaseTest;
 import com.wavemaker.api.tests.designtime.database.OtherDBService;
+import com.wavemaker.api.tests.verifications.database.DatabaseBlobVerification;
 import com.wavemaker.studio.core.data.constants.DBType;
 import com.wavemaker.studio.core.props.DBConnectionProps;
 import com.wavemaker.studio.core.props.TableSelector;
@@ -25,76 +23,53 @@ import static com.wavemaker.api.constants.GroupNameConstants.*;
  * Created by Tejaswi Maryala on 11/17/2017.
  */
 public class SQLServerWithBlobTests extends BaseTest {
+    
     private static final Logger logger = LoggerFactory.getLogger(SQLServerWithBlobTests.class);
-    private final String TABLE_NAME = "AllTypes";
-    private final String dbName = "DB123Test";
-    private DatabaseRunTimeControllerClient dbRunTimeClient = new DatabaseRunTimeControllerClient();
-    private String runtimeId;
+    private DatabaseBlobVerification databaseBlobVerification;
 
     @BeforeClass(alwaysRun = true)
-    public void importSqlServerDB() {
-        OtherDBService otherDBService = new OtherDBService(getSQLServerDBConnectionProps(getProjectDetails().getName()),
-                "testdata/dbjars/sqljdbc4-4.0.jar");
-        runtimeId = otherDBService.createDBService(getProjectDetails());
-    }
+    public void createProjectWithSqlServerDB() {
 
-    @Test(groups = {RUNTIME, DATABASE, SQL_SERVER, GET}, description = "Verifies if we are able to get all records with blob table")
-    public void getAllBlobData() {
-        List<AllTypes> response = dbRunTimeClient
-                .getAllRecords(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME, AllTypes.class).getContent();
-        Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Successful {}", response.toString());
+        //Login and Create project 
+        loginAndCreateProject();
+
+        //Import Database into Project
+        String dbName = "DB123Test";
+        OtherDBService otherDBService = new OtherDBService(getSQLServerDBConnectionProps(getProjectDetails().getName(),dbName),
+                "testdata/dbjars/sqljdbc4-4.0.jar");
+        otherDBService.createDBService(getProjectDetails());
+
+        //Run Application and get appUrl
+        String runTimeUrl = runApp();
+
+        //Set details for verification of Blob
+        databaseBlobVerification = new DatabaseBlobVerification(runTimeUrl, dbName, "AllTypes",AllTypes.class);
     }
 
     @Test(groups = {RUNTIME, DATABASE, SQL_SERVER, INSERT}, description = "Verifies if insertion is successful with blob table")
-    public void insertBlobData() {
-        AllTypes buildAllTypes = SqlServerDBObjectsBuilder.buildAllTypes();
-        AllTypes response = dbRunTimeClient.insertRecordWithMultipartData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
-                buildAllTypes);
-        Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Data insertion with blob column is Successful with response {}", response.toString());
+    public void verifyInsertAndGetSqlServerBlobData() {
+        AllTypes allTypes = SqlServerDBObjectsBuilder.buildAllTypes();
+        databaseBlobVerification.verifyInsertAndGetBlobData(allTypes, allTypes.getPkId().toString());
     }
 
     @Test(groups = {RUNTIME, DATABASE, SQL_SERVER, EXPORT}, description = "Verifies if export data is successful with blob table")
-    public void exportBlobData() {
-        RestResponse response = dbRunTimeClient.exportBlobData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
-                "CSV");
-        Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Export to CSV is successful with response {}", response.toString());
+    public void verifySqlServerExportBlobData() {
+        databaseBlobVerification.verifyExportedBlobData("CSV");
     }
 
-    @Test(groups = {RUNTIME, DATABASE, SQL_SERVER, UPDATE}, description = "Verifies if Updation is successful with blob table")
-    public void updateBlobData() {
-        AllTypes buildAllTypes = SqlServerDBObjectsBuilder.buildAllTypes();
-        AllTypes response = dbRunTimeClient.insertRecordWithMultipartData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
-                buildAllTypes);
-        Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Successful {}", response.toString());
-        String verificationValue = buildAllTypes.getStringColumn();
-        AllTypes buildAllTypes1 = SqlServerDBObjectsBuilder.buildAllTypes(buildAllTypes.getPkId());
-        AllTypes updatedResponse = dbRunTimeClient
-                .updateRecordWithMultipartData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
-                        buildAllTypes.getPkId().toString(), buildAllTypes1);
-        String verificationValueAftUpdate = buildAllTypes1.getStringColumn();
-        Assert.assertFalse(verificationValue.equals(verificationValueAftUpdate), "Update is not successful");
-        Assert.assertNotNull(updatedResponse, "no of records in the table should not be 0");
-        logger.info("Data update with blob column is Successful with response {}", updatedResponse.toString());
+    @Test(enabled = false, groups = {RUNTIME, DATABASE, SQL_SERVER, UPDATE}, description = "Verifies if Updation is successful with blob table")
+    public void verifySqlServerUpdateBlobData() {
+        AllTypes insertData = SqlServerDBObjectsBuilder.buildAllTypes();
+        AllTypes updateData = SqlServerDBObjectsBuilder.buildAllTypes(insertData.getPkId());
+        databaseBlobVerification.verifyUpdateBlobData(insertData,updateData,insertData.getPkId().toString());
     }
 
     @Test(groups = {RUNTIME, DATABASE, SQL_SERVER, DELETE}, description = "Verifies if deletion is successful with blob table")
-    public void DeleteBlobData() {
-        AllTypes buildAllTypes = SqlServerDBObjectsBuilder.buildAllTypes();
-        AllTypes response = dbRunTimeClient.insertRecordWithMultipartData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
-                buildAllTypes);
-        Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Successful {}", response.toString());
-        Boolean deleteResponse = dbRunTimeClient.deleteRecord(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
-                buildAllTypes.getPkId().toString(), buildAllTypes);
-        Assert.assertTrue(deleteResponse, "Delete is not successful");
-        logger.info("Data deletion with blob column is Successful with response {}", deleteResponse.toString());
+    public void verifySqlServerDeleteBlobData() {
+        AllTypes allTypes = SqlServerDBObjectsBuilder.buildAllTypes();
+        databaseBlobVerification.verifyInsertAndDeleteBlobData(allTypes, allTypes.getPkId().toString());
     }
-
-    private DBConnectionProps getSQLServerDBConnectionProps(String projectName) {
+    private DBConnectionProps getSQLServerDBConnectionProps(String projectName,String dbName) {
         List<TableSelector> tableFilter = new ArrayList<>();
         tableFilter.add(new TableSelector("AllTypes", "dbo"));
         List<String> schemaFilter = new ArrayList<>();

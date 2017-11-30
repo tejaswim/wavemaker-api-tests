@@ -7,5 +7,5 @@ import com.wavemaker.api.rest.models.project.ProjectDetails;
  */
 public interface DatabaseServiceCreator {
 
-    String createDBService(ProjectDetails projectDetails);
+    void createDBService(ProjectDetails projectDetails);
 }

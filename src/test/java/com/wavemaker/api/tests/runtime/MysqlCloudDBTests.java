@@ -18,7 +18,9 @@ import com.wavemaker.api.rest.models.database.wmstudio.AllTypes;
 import com.wavemaker.api.tests.builder.OracleDBObjectsBuilder;
 import com.wavemaker.api.tests.core.BaseTest;
 import com.wavemaker.api.tests.designtime.database.MySqlDBCreator;
+import com.wavemaker.api.tests.verifications.database.DatabaseBlobVerification;
 import com.wavemaker.api.utils.ApiUtils;
+import com.wavemaker.api.utils.RuntimeUtils;
 import com.wavemaker.studio.core.data.constants.DBType;
 import com.wavemaker.studio.core.props.DBConnectionProps;
 import com.wavemaker.studio.core.props.TableSelector;
@@ -31,44 +33,52 @@ import static com.wavemaker.api.constants.GroupNameConstants.*;
 public class MysqlCloudDBTests extends BaseTest {
 
     private static final Logger logger = LoggerFactory.getLogger(MysqlCloudDBTests.class);
-    private DatabaseRunTimeControllerClient dbRunTimeClient = new DatabaseRunTimeControllerClient();
     private DatabaseServiceControllerClient dbServiceClient = new DatabaseServiceControllerClient();
-    private String runtimeId;
-    private String dbName;
-    private final String TABLE_NAME = "AllTypes";
+    private DatabaseBlobVerification databaseBlobVerification;
 
     @BeforeClass(alwaysRun = true)
-    public void importDB() {
-        dbName = "alltypes";
+    public void createProjectWithMysqlCloudDB() {
+
+        //Login and Create project 
+        loginAndCreateProject();
+
+        //Import Database into Project
+        String dbName = "alltypes";
         MySqlDBCreator mySqlDBCreator = new MySqlDBCreator(getMysqlCloudProps(getProjectDetails().getName(), dbName));
         File file = new File(ApiUtils.getSqlFilePath("alltypesDB.sql"));
         dbServiceClient.importSqlFile(getProjectDetails().getStudioProjectId(), "", file);
-        runtimeId = mySqlDBCreator.createDBService(getProjectDetails());
+        mySqlDBCreator.createDBService(getProjectDetails());
+
+        //Run Application and get appUrl
+        String runTimeUrl = runApp();
+
+        //Set details for verification of Blob
+        databaseBlobVerification = new DatabaseBlobVerification(runTimeUrl, dbName, "AllTypes", AllTypes.class);
     }
 
-    @Test(groups = {RUNTIME, DATABASE, MYSQL_CLOUD, GET}, description = "Verifies if we are able to get all records with blob table")
-    public void getAllRecords() {
-        //Step 1
-        List<HrdbUser> response = dbRunTimeClient.getAllUsers(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME);
-        Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Get all users is successful");
-    }
 
-    @Test(groups = {RUNTIME, DATABASE, MYSQL_CLOUD, INSERT}, description = "Verifies if insertion is successful with blob table")
-    public void insertBlobData() {
-        AllTypes buildAllTypes = OracleDBObjectsBuilder.buildAllTypes();
-        AllTypes response = dbRunTimeClient.insertRecordWithMultipartData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
-                buildAllTypes);
-        Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Data insertion with blob column is Successful with response {}", response.toString());
+    @Test(groups = {RUNTIME, DATABASE, MYSQL_CLOUD, GET, INSERT}, description = "Verifies if insertion is successful with blob table")
+    public void verifyInsertAndGetMysqlCloudBlobData() {
+        AllTypes allTypes = OracleDBObjectsBuilder.buildAllTypes();
+        databaseBlobVerification.verifyInsertAndGetBlobData(allTypes, allTypes.getPkId().toString());
     }
 
     @Test(groups = {RUNTIME, DATABASE, MYSQL_CLOUD, EXPORT}, description = "Verifies if export data is successful with blob table")
-    public void exportBlobData() {
-        RestResponse response = dbRunTimeClient.exportBlobData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
-                "CSV");
-        Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Export to CSV is successful with response {}", response.toString());
+    public void verifyMysqlCloudExportBlobData() {
+        databaseBlobVerification.verifyExportedBlobData("CSV");
+    }
+
+    @Test(enabled = false, groups = {RUNTIME, DATABASE, MYSQL_CLOUD, UPDATE}, description = "Verifies if Updation is successful with blob table")
+    public void verifyMysqlCloudUpdateBlobData() {
+        AllTypes insertData = OracleDBObjectsBuilder.buildAllTypes();
+        AllTypes updateData = OracleDBObjectsBuilder.buildAllTypes(insertData.getPkId());
+        databaseBlobVerification.verifyUpdateBlobData(insertData, updateData, insertData.getPkId().toString());
+    }
+
+    @Test(groups = {RUNTIME, DATABASE, MYSQL_CLOUD, DELETE}, description = "Verifies if deletion is successful with blob table")
+    public void verifyMysqlCloudDeleteBlobData() {
+        AllTypes allTypes = OracleDBObjectsBuilder.buildAllTypes();
+        databaseBlobVerification.verifyInsertAndDeleteBlobData(allTypes, allTypes.getPkId().toString());
     }
 
     private static DBConnectionProps getMysqlCloudProps(String projectName, String dataModelName) {

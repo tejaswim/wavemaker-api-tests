@@ -19,14 +19,14 @@ public class DeploymentControllerClient extends BaseClient {
     private String deployUrl = "/studio/services/projects/:studioProjectId/deployment/deploy";
 
     public String inplaceDeploy(String studioProjectId) {
-        String url = constructUrl(inPlaceDeployUrl, new String[][]{{STUDIO_PROJECT_ID, studioProjectId}});
+        String url = constructUrl(getBaseUrl() + inPlaceDeployUrl, new String[][]{{STUDIO_PROJECT_ID, studioProjectId}});
         StringWrapper deployMessage = post(url, new RestInputImpl(), StringWrapper.class);
         return deployMessage.getResult();
     }
 
     public String inplaceUnDeploy(String studioProjectId) {
-        String url = constructUrl(inPlaceUnDeployUrl, new String[][]{{STUDIO_PROJECT_ID, studioProjectId}});
-        StringWrapper deployMessage = post(url, new RestInputImpl(),StringWrapper.class);
+        String url = constructUrl(getBaseUrl() + inPlaceUnDeployUrl, new String[][]{{STUDIO_PROJECT_ID, studioProjectId}});
+        StringWrapper deployMessage = post(url, new RestInputImpl(), StringWrapper.class);
         return deployMessage.getResult();
 
     }

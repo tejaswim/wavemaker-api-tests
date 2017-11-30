@@ -22,7 +22,7 @@ public class MySqlDBCreator implements DatabaseServiceCreator {
     }
 
     @Override
-    public String createDBService(final ProjectDetails projectDetails) {
+    public void createDBService(final ProjectDetails projectDetails) {
         String studioProjectId = projectDetails.getStudioProjectId();
 
         //Step 1
@@ -31,8 +31,5 @@ public class MySqlDBCreator implements DatabaseServiceCreator {
         //Step 2
         DataModel result = dbServiceClient.importDatabase(studioProjectId, dbConnectionProps);
         Assert.assertNotNull(result, "Import DB is not Successful");
-
-        //Step 3
-        return RuntimeUtils.getRuntimeProjectId(studioProjectId);
     }
 }

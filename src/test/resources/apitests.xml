@@ -4,6 +4,7 @@
     <test name="Oracle DB Tests">
         <classes>
             <class name="com.wavemaker.api.tests.runtime.OracleWithBlobTests"/>
+            <class name="com.wavemaker.api.tests.runtime.HRDBTests"/>
         </classes>
     </test>
     <test name="HRDB Tests">

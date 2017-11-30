@@ -15,9 +15,8 @@ public class SampleDBCreator implements DatabaseServiceCreator {
     private DatabaseServiceControllerClient dbServiceClient = new DatabaseServiceControllerClient();
 
     @Override
-    public String createDBService(final ProjectDetails projectDetails) {
+    public void createDBService(final ProjectDetails projectDetails) {
         DataModel result = dbServiceClient.importDatabase(projectDetails.getStudioProjectId(), dbServiceClient.getSampleDbConnectionProps(projectDetails.getStudioProjectId()));
         Assert.assertNotNull(result, "Import DB is not Successful");
-        return RuntimeUtils.getRuntimeProjectId(projectDetails.getStudioProjectId());
     }
 }

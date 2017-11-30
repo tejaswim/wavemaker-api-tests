@@ -5,16 +5,14 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.wavemaker.api.client.DatabaseRunTimeControllerClient;
-import com.wavemaker.api.rest.models.RestResponse;
 import com.wavemaker.api.rest.models.database.postgres.AllTypes;
 import com.wavemaker.api.tests.builder.PostgresDBObjectsBuilder;
 import com.wavemaker.api.tests.core.BaseTest;
 import com.wavemaker.api.tests.designtime.database.MySqlDBCreator;
+import com.wavemaker.api.tests.verifications.database.DatabaseBlobVerification;
 import com.wavemaker.studio.core.data.constants.DBType;
 import com.wavemaker.studio.core.props.DBConnectionProps;
 import com.wavemaker.studio.core.props.TableSelector;
@@ -26,74 +24,51 @@ import static com.wavemaker.api.constants.GroupNameConstants.*;
  */
 public class PostgressqlWithBlobTests extends BaseTest {
     private static final Logger logger = LoggerFactory.getLogger(PostgressqlWithBlobTests.class);
-    private final String TABLE_NAME = "AllTypes";
-    private final String dbName = "viewsdb";
-    private DatabaseRunTimeControllerClient dbRunTimeClient = new DatabaseRunTimeControllerClient();
-    private String runtimeId;
+    private DatabaseBlobVerification databaseBlobVerification;
 
     @BeforeClass(alwaysRun = true)
-    public void importPostgresSQLDB() {
-        MySqlDBCreator mySqlDBCreator = new MySqlDBCreator(getPostgressqlDBConnectionProps(getProjectDetails().getName()));
-        runtimeId = mySqlDBCreator.createDBService(getProjectDetails());
+    public void createProjectWithPostgresSQLDB() {
+
+        //Login and Create project
+        loginAndCreateProject();
+
+        //Import Database into Project
+        String dbName = "viewsdb";
+        MySqlDBCreator mySqlDBCreator = new MySqlDBCreator(getPostgressqlDBConnectionProps(getProjectDetails().getName(), dbName));
+        mySqlDBCreator.createDBService(getProjectDetails());
+
+        //Run Application and get appUrl
+        String runTimeUrl = runApp();
+
+        //Set details for verification of Blob
+        databaseBlobVerification = new DatabaseBlobVerification(runTimeUrl, dbName, "AllTypes", AllTypes.class);
     }
 
-    @Test(groups = {RUNTIME, DATABASE, POSTGRES_SQL, GET}, description = "Verifies if we are able to get all records with blob table")
-    public void getAllBlobData() {
-        List<AllTypes> response = dbRunTimeClient
-                .getAllRecords(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME, AllTypes.class).getContent();
-        Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Successful {}", response.toString());
-    }
-
-    @Test(groups = {RUNTIME, DATABASE, POSTGRES_SQL, INSERT}, description = "Verifies if insertion is successful with blob table")
-    public void insertBlobData() {
-        AllTypes buildAllTypes = PostgresDBObjectsBuilder.buildAllTypes();
-        AllTypes response = dbRunTimeClient.insertRecordWithMultipartData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
-                buildAllTypes);
-        Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Data insertion with blob column is Successful with response {}", response.toString());
+    @Test(groups = {RUNTIME, DATABASE, POSTGRES_SQL, GET, INSERT}, description = "Verifies if we are able to get all records with blob table")
+    public void verifyInsertAndGetPostgresSqlBlobData() {
+        AllTypes allTypes = PostgresDBObjectsBuilder.buildAllTypes();
+        databaseBlobVerification.verifyInsertAndGetBlobData(allTypes, allTypes.getId().toString());
     }
 
     @Test(groups = {RUNTIME, DATABASE, POSTGRES_SQL, EXPORT}, description = "Verifies if export data is successful with blob table")
-    public void exportBlobData() {
-        RestResponse response = dbRunTimeClient.exportBlobData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
-                "CSV");
-        Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Export to CSV is successful with response {}", response.toString());
+    public void verifyOracleExportBlobData() {
+        databaseBlobVerification.verifyExportedBlobData("CSV");
     }
 
     @Test(groups = {RUNTIME, DATABASE, POSTGRES_SQL, UPDATE}, description = "Verifies if Updation is successful with blob table")
-    public void updateBlobData() {
-        AllTypes buildAllTypes = PostgresDBObjectsBuilder.buildAllTypes();
-        AllTypes response = dbRunTimeClient.insertRecordWithMultipartData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
-                buildAllTypes);
-        Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Successful {}", response.toString());
-        String verificationValue = buildAllTypes.getStringColumn();
-        AllTypes buildAllTypes1 = PostgresDBObjectsBuilder.buildAllTypes(buildAllTypes.getId());
-        AllTypes updatedResponse = dbRunTimeClient
-                .updateRecordWithMultipartData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
-                        buildAllTypes.getId().toString(), buildAllTypes1);
-        String verificationValueAftUpdate = buildAllTypes1.getStringColumn();
-        Assert.assertFalse(verificationValue.equals(verificationValueAftUpdate), "Update is not successful");
-        Assert.assertNotNull(updatedResponse, "no of records in the table should not be 0");
-        logger.info("Data update with blob column is Successful with response {}", updatedResponse.toString());
+    public void verifyPostgresSqlUpdateBlobData() {
+        AllTypes insertData = PostgresDBObjectsBuilder.buildAllTypes();
+        AllTypes updateData = PostgresDBObjectsBuilder.buildAllTypes(insertData.getId());
+        databaseBlobVerification.verifyUpdateBlobData(insertData, updateData, insertData.getId().toString());
     }
 
     @Test(groups = {RUNTIME, DATABASE, POSTGRES_SQL, DELETE}, description = "Verifies if deletion is successful with blob table")
-    public void DeleteBlobData() {
-        AllTypes buildAllTypes = PostgresDBObjectsBuilder.buildAllTypes();
-        AllTypes response = dbRunTimeClient.insertRecordWithMultipartData(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
-                buildAllTypes);
-        Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Successful {}", response.toString());
-        Boolean deleteResponse = dbRunTimeClient.deleteRecord(runtimeId, getProjectDetails().getName(), dbName, TABLE_NAME,
-                buildAllTypes.getId().toString(), buildAllTypes);
-        Assert.assertTrue(deleteResponse, "Delete is not successful");
-        logger.info("Data deletion with blob column is Successful with response {}", deleteResponse.toString());
+    public void verifyPostgresSqlDeleteBlobData() {
+        AllTypes allTypes = PostgresDBObjectsBuilder.buildAllTypes();
+        databaseBlobVerification.verifyInsertAndDeleteBlobData(allTypes, allTypes.getId().toString());
     }
 
-    private DBConnectionProps getPostgressqlDBConnectionProps(String projectName) {
+    private DBConnectionProps getPostgressqlDBConnectionProps(String projectName, final String dbName) {
         List<TableSelector> tableFilter = new ArrayList<>();
         tableFilter.add(new TableSelector("all types", "public"));
         List<String> schemaFilter = new ArrayList<>();

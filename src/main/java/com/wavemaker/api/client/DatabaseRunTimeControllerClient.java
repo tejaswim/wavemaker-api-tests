@@ -31,21 +31,24 @@ public class DatabaseRunTimeControllerClient extends RunTimeClient {
     private static final String PROJECT_NAME = "projectName";
     private static final String DB_NAME = "dbName";
     private static final String TABLE_NAME = "tableName";
+    private String appUrl;
 
-    public List<HrdbUser> getAllUsers(String runtimeProjectId, String projectName, String dbName, String tableName) {
-        String url = constructUrl(ALL_RECORDS_URL, new String[][]{{RUNTIME_PROJECT_ID, runtimeProjectId}, {PROJECT_NAME, projectName},
-                {DB_NAME, dbName}, {TABLE_NAME, tableName}});
-        ApiResponse<HrdbUser> response = get(url, new ParameterizedTypeReference<ApiResponse<HrdbUser>>() {
-        });
-        List<HrdbUser> hrdbUsers = response.getContent();
-        return hrdbUsers;
+    public DatabaseRunTimeControllerClient(final String appUrl) {
+        this.appUrl = appUrl;
     }
 
-    public <T> ApiResponse<T> getAllRecords(String runtimeProjectId, String projectName, String dbName, String tableName, Class<T> t) {
-        String url = constructUrl(ALL_RECORDS_URL, new String[][]{{RUNTIME_PROJECT_ID, runtimeProjectId}, {PROJECT_NAME, projectName},
-                {DB_NAME, dbName}, {TABLE_NAME, tableName}});
-        ApiResponse<T> response = getApiResponse(url, t);
-        return response;
+    public List<HrdbUser> getAllUsers(String runtimeProjectId, String projectName, String dbName, String tableName) {
+        String url = constructUrl(appUrl + ALL_RECORDS_URL,
+                new String[][]{{RUNTIME_PROJECT_ID, runtimeProjectId}, {PROJECT_NAME, projectName},
+                        {DB_NAME, dbName}, {TABLE_NAME, tableName}});
+        ApiResponse<HrdbUser> response = get(url, new ParameterizedTypeReference<ApiResponse<HrdbUser>>() {
+        });
+        return response.getContent();
+    }
+
+    public <T> ApiResponse<T> getAllRecords(String dbName, String tableName, Class<T> t) {
+        String url = constructUrl(appUrl + ALL_RECORDS_URL, new String[][]{{DB_NAME, dbName}, {TABLE_NAME, tableName}});
+        return getApiResponse(url, t);
     }
 
     public <T> T insertRecord(String runtimeProjectId, String projectName, String dbName, String tableName, final T t) {
@@ -53,57 +56,51 @@ public class DatabaseRunTimeControllerClient extends RunTimeClient {
     }
 
     public <T> T insertRecord(String runtimeProjectId, String projectName, String dbName, String tableName, final T t, Map csrfHeader) {
-        String url = constructUrl(ALL_RECORDS_URL, new String[][]{{RUNTIME_PROJECT_ID, runtimeProjectId}, {PROJECT_NAME, projectName},
-                {DB_NAME, dbName}, {TABLE_NAME, tableName}});
+        String url = constructUrl(appUrl + ALL_RECORDS_URL,
+                new String[][]{{RUNTIME_PROJECT_ID, runtimeProjectId}, {PROJECT_NAME, projectName},
+                        {DB_NAME, dbName}, {TABLE_NAME, tableName}});
         IRestInput payload = new RestInputImpl() {
             @Override
             public T getPayload() {
                 return t;
             }
         };
-        T response = (T) post(url, payload, t.getClass(), csrfHeader);
-        return response;
+        return (T) post(url, payload, t.getClass(), csrfHeader);
     }
 
-    public <T> T insertRecordWithMultipartData(String runtimeProjectId, String projectName, String dbName, String tableName, final T t) {
-        String url = constructUrl(ALL_RECORDS_URL, new String[][]{{RUNTIME_PROJECT_ID, runtimeProjectId}, {PROJECT_NAME, projectName},
-                {DB_NAME, dbName}, {TABLE_NAME, tableName}});
+    public <T> T insertRecordWithMultipartData(String dbName, String tableName, final T t) {
+        String url = constructUrl(appUrl + ALL_RECORDS_URL, new String[][]{{DB_NAME, dbName}, {TABLE_NAME, tableName}});
         MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("wm_data_json", t);
         multiValueMap.add("blobColumn", new ClassPathResource("/images/wmlogo.png"));
-        T response = (T) post(url, new MultipartInput(multiValueMap), t.getClass());
-        return response;
+        return (T) post(url, new MultipartInput(multiValueMap), t.getClass());
     }
 
-    public <T> T updateRecordWithMultipartData(
-            String runtimeProjectId, String projectName, String dbName, String tableName, String pkColumnValue, final T t) {
-        String url = constructUrl(RECORD_BY_PK_COLUMN_URL,
-                new String[][]{{RUNTIME_PROJECT_ID, runtimeProjectId}, {PROJECT_NAME, projectName},
-                        {DB_NAME, dbName}, {TABLE_NAME, tableName}, {"pkColumnValue", pkColumnValue}});
+    public <T> T updateRecordWithMultipartData(String dbName, String tableName, String pkColumnValue, final T t) {
+        String url = constructUrl(appUrl + RECORD_BY_PK_COLUMN_URL, new String[][]{{DB_NAME, dbName},
+                {TABLE_NAME, tableName}, {"pkColumnValue", pkColumnValue}});
         MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("wm_data_json", t);
         multiValueMap.add("blobColumn", new ClassPathResource("/images/chart.png"));
-        T response = (T) post(url, new MultipartInput(multiValueMap), t.getClass());
-        return response;
+        return (T) post(url, new MultipartInput(multiValueMap), t.getClass());
     }
 
-    public <T> Boolean deleteRecord(
-            String runtimeProjectId, String projectName, String dbName, String tableName, String pkColumnValue, final T t) {
-        String url = constructUrl(RECORD_BY_PK_COLUMN_URL,
-                new String[][]{{RUNTIME_PROJECT_ID, runtimeProjectId}, {PROJECT_NAME, projectName},
-                        {DB_NAME, dbName}, {TABLE_NAME, tableName}, {"pkColumnValue", pkColumnValue}});
-        IRestInput payload = new RestInputImpl() {
-            @Override
-            public T getPayload() {
-                return t;
-            }
-        };
-        return delete(url, payload, BooleanWrapper.class).getResult();
+    public <T> Boolean deleteRecord(String dbName, String tableName, String pkColumnValue) {
+        String url = constructUrl(appUrl + RECORD_BY_PK_COLUMN_URL,
+                new String[][]{{DB_NAME, dbName}, {TABLE_NAME, tableName}, {"pkColumnValue", pkColumnValue}});
+        return delete(url, BooleanWrapper.class).getResult();
     }
 
-    public RestResponse exportBlobData(String runtimeProjectId, String projectName, String dbName, String tableName, String exportType) {
-        String url = constructUrl(EXPORT_URL, new String[][]{{RUNTIME_PROJECT_ID, runtimeProjectId}, {PROJECT_NAME, projectName},
-                {DB_NAME, dbName}, {TABLE_NAME, tableName}, {"exportType", exportType}});
+    public RestResponse exportBlobData(String dbName, String tableName, String exportType) {
+        String url = constructUrl(appUrl + EXPORT_URL,
+                new String[][]{{DB_NAME, dbName}, {TABLE_NAME, tableName}, {"exportType", exportType}});
         return get(url);
+    }
+
+    public <T> T getRecordByPkColumn(String dbName, String tableName, Class<T> klass, String pkColumnValue) {
+        String url = constructUrl(appUrl + RECORD_BY_PK_COLUMN_URL,
+                new String[][]{{DB_NAME, dbName}, {TABLE_NAME, tableName}, {"pkColumnValue", pkColumnValue}});
+        T response = get(url, klass);
+        return response;
     }
 }

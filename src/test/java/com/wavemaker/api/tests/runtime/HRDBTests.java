@@ -1,24 +1,17 @@
 package com.wavemaker.api.tests.runtime;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.wavemaker.api.client.DatabaseRunTimeControllerClient;
-import com.wavemaker.api.rest.models.RestResponse;
-import com.wavemaker.api.rest.models.database.HrdbUser;
+import com.wavemaker.api.rest.models.database.sampledb.User;
+import com.wavemaker.api.tests.builder.SampleDBObjectsBuilder;
 import com.wavemaker.api.tests.core.BaseTest;
 import com.wavemaker.api.tests.designtime.database.SampleDBCreator;
+import com.wavemaker.api.tests.verifications.database.DatabaseBlobVerification;
 
-import static com.wavemaker.api.constants.GroupNameConstants.DATABASE;
-import static com.wavemaker.api.constants.GroupNameConstants.EXPORT;
-import static com.wavemaker.api.constants.GroupNameConstants.GET;
-import static com.wavemaker.api.constants.GroupNameConstants.RUNTIME;
-import static com.wavemaker.api.constants.GroupNameConstants.SAMPLE_DB;
+import static com.wavemaker.api.constants.GroupNameConstants.*;
 
 /**
  * Created by Tejaswi Maryala on 11/17/2017.
@@ -26,30 +19,45 @@ import static com.wavemaker.api.constants.GroupNameConstants.SAMPLE_DB;
 public class HRDBTests extends BaseTest {
 
     private static final Logger logger = LoggerFactory.getLogger(HRDBTests.class);
-    private DatabaseRunTimeControllerClient dbRunTimeClient = new DatabaseRunTimeControllerClient();
-    private SampleDBCreator sampleDBCreator = new SampleDBCreator();
-    private String runtimeId;
-    private String dbName = "hrdb";
-    private String tableName = "User";
+    private DatabaseBlobVerification databaseBlobVerification;
 
     @BeforeClass(alwaysRun = true)
-    public void importDB() {
-        runtimeId = sampleDBCreator.createDBService(getProjectDetails());
+    public void createProjectAndImportHRDB() {
+        //Login and Create project
+        loginAndCreateProject();
+
+        //Import Database into Project
+        SampleDBCreator sampleDBCreator = new SampleDBCreator();
+        sampleDBCreator.createDBService(getProjectDetails());
+
+        //Run Application and get appUrl
+        String runTimeUrl = runApp();
+
+        //Set details for verification of Blob
+        databaseBlobVerification = new DatabaseBlobVerification(runTimeUrl, "hrdb", "User", User.class);
     }
 
-    @Test(groups = {RUNTIME, DATABASE, SAMPLE_DB, GET}, description = "Verifies if we are able to get all records with blob table")
-    public void getAllRecords() {
-        //Step 1
-        List<HrdbUser> response = dbRunTimeClient.getAllUsers(runtimeId, getProjectDetails().getName(), dbName, tableName);
-        Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Get all users is successful");
+    @Test(groups = {RUNTIME, DATABASE, ORACLE, GET, INSERT}, description = "Verifies if insertion is successful with blob table")
+    public void verifyInsertAndGetSampleDBBlobData() {
+        User user = SampleDBObjectsBuilder.buildUser();
+        databaseBlobVerification.verifyInsertAndGetBlobData(user, user.getUserId().toString());
     }
 
-    @Test(groups = {RUNTIME, DATABASE, SAMPLE_DB, EXPORT}, description = "Verifies if export data is successful with blob table")
-    public void exportBlobData() {
-        RestResponse response = dbRunTimeClient.exportBlobData(runtimeId, getProjectDetails().getName(), dbName, tableName,
-                "CSV");
-        Assert.assertNotNull(response, "no of records in the table should not be 0");
-        logger.info("Export to CSV is successful with response {}", response.toString());
+    @Test(groups = {RUNTIME, DATABASE, ORACLE, EXPORT}, description = "Verifies if export data is successful with blob table")
+    public void verifySampleDBExportBlobData() {
+        databaseBlobVerification.verifyExportedBlobData("CSV");
+    }
+
+    @Test(enabled = false, groups = {RUNTIME, DATABASE, ORACLE, UPDATE}, description = "Verifies if Updation is successful with blob table")
+    public void verifySampleDBUpdateBlobData() {
+        User user = SampleDBObjectsBuilder.buildUser();
+        User updatedUser = SampleDBObjectsBuilder.buildUser();
+        databaseBlobVerification.verifyUpdateBlobData(user, updatedUser, user.getUserId().toString());
+    }
+
+    @Test(groups = {RUNTIME, DATABASE, ORACLE, DELETE}, description = "Verifies if deletion is successful with blob table")
+    public void verifySampleDBDeleteBlobData() {
+        User user = SampleDBObjectsBuilder.buildUser();
+        databaseBlobVerification.verifyInsertAndDeleteBlobData(user, user.getUserId().toString());
     }
 }

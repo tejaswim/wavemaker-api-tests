@@ -46,7 +46,7 @@ public class ProjectControllerClient extends BaseClient {
     }
 
     public boolean deleteProject(String projectId) {
-        final String url = constructUrl(projectUrl, new String[][]{{"projectId", projectId}});
+        final String url = constructUrl(getBaseUrl() + projectUrl, new String[][]{{"projectId", projectId}});
         final BooleanWrapper deleteStatus = delete(url, BooleanWrapper.class);
         return deleteStatus.getResult();
     }

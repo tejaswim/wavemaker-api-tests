@@ -200,16 +200,23 @@ public class AllTypes{
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (!(o instanceof AllTypes)) return false;
         final AllTypes allTypes = (AllTypes) o;
-        return Objects.equals(getPkId(), allTypes.getPkId());
+        return Objects.equals(getPkId(), allTypes.getPkId()) &&
+                Objects.equals(getIntegerColumn(), allTypes.getIntegerColumn()) &&
+                Objects.equals(getStringColumn(), allTypes.getStringColumn()) &&
+                Objects.equals(getTextColumn(), allTypes.getTextColumn()) &&
+                Objects.equals(getClobColumn(), allTypes.getClobColumn()) &&
+                Objects.equals(getCharacterColumn(), allTypes.getCharacterColumn()) &&
+                Objects.equals(getBooleanColumn(), allTypes.getBooleanColumn());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPkId());
+        return Objects.hash(getPkId(), getIntegerColumn(), getStringColumn(), getTextColumn(), getClobColumn(), getCharacterColumn(),
+                getBooleanColumn());
     }
 
     @Override

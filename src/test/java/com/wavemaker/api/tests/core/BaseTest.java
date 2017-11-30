@@ -1,10 +1,11 @@
 package com.wavemaker.api.tests.core;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 
 import com.wavemaker.api.client.ProjectControllerClient;
 import com.wavemaker.api.config.StudioTestConfig;
@@ -14,6 +15,8 @@ import com.wavemaker.api.rest.models.project.ProjectModel;
 import com.wavemaker.api.rest.models.project.ProjectType;
 import com.wavemaker.api.login.ApiAuthenticationManager;
 import com.wavemaker.api.tests.designtime.project.ProjectHandler;
+import com.wavemaker.api.tests.verifications.database.DatabaseBlobVerification;
+import com.wavemaker.api.utils.RuntimeUtils;
 
 /**
  * Created by ArjunSahasranam on 4/2/16.
@@ -27,7 +30,7 @@ public abstract class BaseTest implements ApiTest {
     private ProjectDetails projectDetails;
     private ProjectControllerClient projectControllerClient = new ProjectControllerClient();
 
-    public ProjectDetails getProjectDetails() {
+    protected ProjectDetails getProjectDetails() {
         return projectDetails;
     }
 
@@ -35,10 +38,14 @@ public abstract class BaseTest implements ApiTest {
         this.projectDetails = projectDetails;
     }
 
-    @BeforeClass(alwaysRun = true)
-    public void loginAndCreateProject(){
+    protected void loginAndCreateProject(){
         authenticationManager.login();
         projectDetails = projectHandler.createProject(getProjectModel());
+    }
+
+    protected String runApp() {
+        String runtimeId = RuntimeUtils.getRuntimeProjectId(getProjectDetails().getStudioProjectId());
+        return getBaseUrl() + "/" + runtimeId + "/" + getProjectDetails().getName();
     }
 
     @AfterClass
@@ -56,5 +63,9 @@ public abstract class BaseTest implements ApiTest {
         projectModel.setProjectShellId("");
         projectModel.setIcon("default.png");
         return projectModel;
+    }
+
+    protected String getBaseUrl() {
+        return StudioTestConfig.getInstance().getUrl();
     }
 }

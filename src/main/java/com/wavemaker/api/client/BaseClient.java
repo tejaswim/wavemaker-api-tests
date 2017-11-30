@@ -35,6 +35,16 @@ public class BaseClient {
     }
 
     public String constructUrl(String url, String[][] params) {
+        String fullUrl = url;
+        for (int i = 0; i < params.length; i++) {
+            final String key = params[i][0];
+            final String value = params[i][1];
+            fullUrl = StringUtils.replace(fullUrl, ":" + key, value);
+        }
+        return fullUrl;
+    }
+
+    public String constructDesignTimeUrl(String url, String[][] params) {
         String fullUrl = getBaseUrl() + url;
         for (int i = 0; i < params.length; i++) {
             final String key = params[i][0];
@@ -57,12 +67,14 @@ public class BaseClient {
         return restConnectorTemplate.execute(method, SecurityManager.getAuthCookie(), endpointAddress, restInput, handleErrors, headers);
     }
 
-    public RestResponse execute(HttpMethod method, String auth, String endpointAddress, IRestInput restInput, boolean handleErrors, Map headers) {
+    public RestResponse execute(
+            HttpMethod method, String auth, String endpointAddress, IRestInput restInput, boolean handleErrors, Map headers) {
         return restConnectorTemplate.execute(method, auth, endpointAddress, restInput, handleErrors, headers);
     }
 
     /**
-     * Tests which need RestResponse to check status code can use this method so that framework skips exception handling and termination of test case
+     * Tests which need RestResponse to check status code can use this method so that framework skips exception handling and termination of
+     * test case
      */
     public RestResponse execute(HttpMethod method, String endpointAddress, IRestInput restInput, boolean handleError) {
         return restConnectorTemplate.execute(method, SecurityManager.getAuthCookie(), endpointAddress, restInput, handleError);
@@ -74,7 +86,8 @@ public class BaseClient {
     }
 
     /**
-     * Tests which need RestResponse to check status code can use this method so that framework skips exception handling and termination of test case
+     * Tests which need RestResponse to check status code can use this method so that framework skips exception handling and termination of
+     * test case
      */
     public RestResponse execute(
             HttpMethod method, final String authCookie, String endpointAddress, IRestInput restInput, boolean handleErrors) {
@@ -157,7 +170,7 @@ public class BaseClient {
                 T tObject = WMObjectMapper.getInstance().readValue(bytes, t);
                 list.add(tObject);
             } catch (Exception e) {
-                throw new RuntimeException("Failed to convert object into type " + t.getClass().getName());
+                throw new RuntimeException("Failed to convert object into type " + t.getClass().getName(), e);
             }
         }
         return list;
@@ -192,7 +205,7 @@ public class BaseClient {
         return body;
     }
 
-    private String getBaseUrl() {
+    protected String getBaseUrl() {
         return StudioTestConfig.getInstance().getUrl();
     }
 }
