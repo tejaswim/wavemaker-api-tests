@@ -6,7 +6,7 @@
 
     <groupId>com.wavemaker.tests</groupId>
     <artifactId>wavemaker-api-tests</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>9.9.9</version>
 
     <build>
         <plugins>
@@ -36,10 +36,10 @@
                         <property>
                             <name>listener</name>
                             <value>
-                                com.wavemaker.api.listeners.WMIAnnotationTransformer,
-                                com.wavemaker.api.listeners.WMIAlterListener,
-                                com.wavemaker.api.listeners.WMTestListener,
-                                com.wavemaker.api.report.ReportGenerator2
+                                com.wavemaker.tests.api.listeners.WMIAnnotationTransformer,
+                                com.wavemaker.tests.api.listeners.WMIAlterListener,
+                                com.wavemaker.tests.api.listeners.WMTestListener,
+                                com.wavemaker.tests.api.report.ReportGenerator2
                             </value>
                         </property>
                     </properties>
